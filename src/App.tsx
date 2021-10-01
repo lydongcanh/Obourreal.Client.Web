@@ -1,13 +1,27 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./App.css";
-import LoginButton from "./components/LoginButton";
-import auth0 from "auth0-js";
+import { LoginButton, LogoutButton, UserProfile } from "./components";
+import { useAuth0 } from "@auth0/auth0-react";
 
 function App() {
 
+  const { isAuthenticated } = useAuth0();
+
 	return (
 		<div className="App">
-			<LoginButton />
+			<div className="App-header">
+				{
+					isAuthenticated 
+						? (
+							<div>
+								<UserProfile />
+								<LogoutButton />
+							</div>
+						)
+						: <LoginButton />
+				}
+				
+			</div>
 		</div>
 	);
 }
