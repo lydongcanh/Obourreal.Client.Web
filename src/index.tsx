@@ -9,6 +9,8 @@ ReactDOM.render(
   <Auth0Provider
     domain="obourreal.au.auth0.com"
     clientId="cwCQs4mJCKJNCrPxXMLqNB4RYrS148Jw"
+    audience="https://obourreal.au.auth0.com/api/v2/"
+    scope="read:current_user update:current_user_metadata"
     redirectUri={window.location.origin}
   >
     <App />
