@@ -1,42 +1,60 @@
 import React, { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import axios from "axios";
 
 const UserProfile = () => {
 
   const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
   const [userMetadata, setUserMetadata] = useState(null);
+  const [identityAccessToken, setIdentityAccessToken] = useState("");
+  const [managementAccessToken, setManagementAccessToken] = useState("");
 
   useEffect(() => {
-    if (!user)
-      return;
+    const getIdentityAccessToken = async () => {
+      try {
+        const accessToken = await getAccessTokenSilently({
+          audience: `https://identity/api`,
+          scope: "read:users",
+        });
 
-    const getUserMetadata = async () => {
+        setIdentityAccessToken(accessToken);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    getIdentityAccessToken();
+  }, [getAccessTokenSilently]);
+
+  useEffect(() => {
+    const getManagementAccessToken = async () => {
+      if (!user)
+        return;
+
       const domain = "obourreal.au.auth0.com";
-  
       try {
         const accessToken = await getAccessTokenSilently({
           audience: `https://${domain}/api/v2/`,
           scope: "read:current_user",
         });
-  
+
         const userDetailsByIdUrl = `https://${domain}/api/v2/users/${user.sub}`;
-  
-        const metadataResponse = await fetch(userDetailsByIdUrl, {
+        const metadataResponse = await axios.get(userDetailsByIdUrl, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-  
-        const { user_metadata } = await metadataResponse.json();
-  
+        const { user_metadata } = await metadataResponse.data;
+        
         setUserMetadata(user_metadata);
+        setManagementAccessToken(accessToken);
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
     };
-  
-    getUserMetadata();
-  }, [getAccessTokenSilently, user?.sub]);
+
+    getManagementAccessToken();
+  }, [getAccessTokenSilently]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -61,6 +79,36 @@ const UserProfile = () => {
         ) : (
           "No user metadata defined"
         )}
+
+      <br /><br />
+      <button onClick={async () => {
+        const response = await axios.get("https://localhost:5001/api/messages/claims", {
+          headers: {
+            'Authorization': `Bearer ${identityAccessToken}`
+          }
+        });
+        console.log(response.data);
+      }}>Identity API Claims</button>
+   
+      <br /><br />
+      <button onClick={async () => {
+        const response = await axios.get("https://localhost:5001/api/messages/claims", {
+          headers: {
+            'Authorization': `Bearer ${managementAccessToken}`
+          }
+        });
+        console.log(response.data);
+      }}>Management API Claims</button>
+
+      <br /><br />
+      <button onClick={async () => {
+        const response = await axios.get("https://localhost:5001/api/messages/private-scoped", {
+          headers: {
+            'Authorization': `Bearer ${identityAccessToken}`
+          }
+        });
+        console.log(response.data);
+      }}>Private</button>
     </div>
   );
 }

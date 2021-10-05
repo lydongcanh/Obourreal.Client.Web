@@ -1,4 +1,3 @@
-import { useState } from "react";
 import "./App.css";
 import { LoginButton, LogoutButton, UserProfile } from "./components";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -22,7 +21,6 @@ function App() {
 						)
 						: <LoginButton />
 				}
-
 			</div>
 		</div>
 	);
