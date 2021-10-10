@@ -9,7 +9,7 @@ function App() {
 	return (
 		<div className="App">
 			<div className="App-header">
-				<img style={{ maxWidth: 250 }} src={process.env.PUBLIC_URL + 'logo.svg'} />
+				<img style={{ maxWidth: 250 }} src={process.env.PUBLIC_URL + 'logo.svg'} alt="Obourreal logo" />
 				<br />
 				{
 					isAuthenticated

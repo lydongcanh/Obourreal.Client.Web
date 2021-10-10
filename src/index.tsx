@@ -8,8 +8,8 @@ ReactDOM.render(
   <Auth0Provider
     domain="obourreal.au.auth0.com"
     clientId="cwCQs4mJCKJNCrPxXMLqNB4RYrS148Jw"
-    audience="https://identity/api"
-    scope="read:users"
+    audience="https://identity.obourreal.com/api"
+    scope="read:users"    
     redirectUri={window.location.origin}
   >
     <App />

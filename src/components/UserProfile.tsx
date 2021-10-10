@@ -6,6 +6,7 @@ const UserProfile = () => {
 
   const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
   const [userMetadata, setUserMetadata] = useState(null);
+  const [appMetadata, seAppMetadata] = useState(null);
   const [identityAccessToken, setIdentityAccessToken] = useState("");
   const [managementAccessToken, setManagementAccessToken] = useState("");
 
@@ -13,7 +14,7 @@ const UserProfile = () => {
     const getIdentityAccessToken = async () => {
       try {
         const accessToken = await getAccessTokenSilently({
-          audience: `https://identity/api`,
+          audience: "https://identity.obourreal.com/api",
           scope: "read:users",
         });
 
@@ -44,9 +45,9 @@ const UserProfile = () => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        const { user_metadata } = await metadataResponse.data;
-        
+        const { user_metadata, app_metadata } = await metadataResponse.data;
         setUserMetadata(user_metadata);
+        seAppMetadata(app_metadata);
         setManagementAccessToken(accessToken);
       } catch (e) {
         console.error(e);
@@ -54,7 +55,7 @@ const UserProfile = () => {
     };
 
     getManagementAccessToken();
-  }, [getAccessTokenSilently]);
+  }, [getAccessTokenSilently, user]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -79,10 +80,16 @@ const UserProfile = () => {
         ) : (
           "No user metadata defined"
         )}
+      <h3>App Metadata</h3>
+        {appMetadata ? (
+          <pre>{JSON.stringify(appMetadata, null, 2)}</pre>
+        ) : (
+          "No app metadata defined"
+        )}
 
       <br /><br />
       <button onClick={async () => {
-        const response = await axios.get("https://localhost:5001/api/messages/claims", {
+        const response = await axios.get("https://localhost:5001/api/test/claims", {
           headers: {
             'Authorization': `Bearer ${identityAccessToken}`
           }
@@ -92,7 +99,7 @@ const UserProfile = () => {
    
       <br /><br />
       <button onClick={async () => {
-        const response = await axios.get("https://localhost:5001/api/messages/claims", {
+        const response = await axios.get("https://localhost:5001/api/test/claims", {
           headers: {
             'Authorization': `Bearer ${managementAccessToken}`
           }
@@ -102,7 +109,7 @@ const UserProfile = () => {
 
       <br /><br />
       <button onClick={async () => {
-        const response = await axios.get("https://localhost:5001/api/messages/private-scoped", {
+        const response = await axios.get("https://localhost:5001/api/test/private-scoped", {
           headers: {
             'Authorization': `Bearer ${identityAccessToken}`
           }
